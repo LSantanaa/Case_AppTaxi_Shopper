@@ -1,0 +1,18 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/appTaxi"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Drivers {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  car         String
+  assessment  Float
+  rateKM      Float
+  minKM       Int
+}

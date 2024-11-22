@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: npm run dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/backend
+      - /app/node_modules
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL="postgresql://postgres:postgres@db:5432/appTaxi"
+
+  db:
+    image: bitnami/postgres:lastest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appTaxi
+    volumes:
+      - db-data:/var/lib/postgresql/data 
+
+volumes:
+  db-data:
