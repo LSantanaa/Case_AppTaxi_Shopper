@@ -1,8 +1,8 @@
 import { Router } from "express";
-import * as RideController from '../controllers/index'
+import * as RideController from '../controllers/rideController'
 
 const RideRouters = Router();
 
-RideRouters.get('/estimate', RideController.estimate)
+RideRouters.post('/estimate', RideController.estimate)
 
 export default RideRouters;

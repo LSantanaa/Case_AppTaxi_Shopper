@@ -5,6 +5,7 @@ CREATE TABLE "Drivers" (
     "description" TEXT NOT NULL,
     "car" TEXT NOT NULL,
     "assessment" DOUBLE PRECISION NOT NULL,
+    "assessment_text" TEXT NOT NULL,
     "rateKM" DOUBLE PRECISION NOT NULL,
     "minKM" INTEGER NOT NULL,
 

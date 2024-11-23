@@ -1,7 +1,6 @@
-import express, {Request, Response} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import RideRouters from './routes';
-import dotenv from 'dotenv';
-dotenv.config();
+import { PORT } from './config/env.';
 
 const app = express();
 app.use(express.json())
@@ -12,4 +11,9 @@ app.use('/', async (req:Request, res:Response)=>{
   res.json({message: "Hello World!"})
 })
 
-app.listen(process.env.PORT || 8080, ()=> `Server running on port ${process.env.PORT}`)
+app.use((err:Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
+
+app.listen(PORT,()=> console.log(`Server running on port ${PORT}`))

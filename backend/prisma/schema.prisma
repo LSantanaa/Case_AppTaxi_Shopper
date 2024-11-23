@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("postgresql://postgres:postgres@db:5432/appTaxi")
 }
 
 generator client {
@@ -8,11 +8,12 @@ generator client {
 }
 
 model Drivers {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-  car         String
-  assessment  Float
-  rateKM      Float
-  minKM       Int
+  id              Int    @id @default(autoincrement())
+  name            String
+  description     String
+  car             String
+  assessment      Float
+  assessment_text String
+  rateKM          Float
+  minKM           Int
 }
