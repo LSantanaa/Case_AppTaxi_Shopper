@@ -1,19 +1,21 @@
 datasource db {
   provider = "postgresql"
-  url      = env("postgresql://postgres:postgres@db:5432/appTaxi")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Drivers {
-  id              Int    @id @default(autoincrement())
-  name            String
-  description     String
-  car             String
-  assessment      Float
-  assessment_text String
-  rateKM          Float
-  minKM           Int
+model TravelsHistory {
+  id          Int      @id @default(autoincrement())
+  custumer_id Int
+  origin      String
+  destination String
+  distance    Int
+  duration    String
+  driver_id   Int
+  driver_name String
+  value       Float
+  date        DateTime @default(now())
 }

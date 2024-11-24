@@ -7,5 +7,7 @@
 .git
 .gitignore
 
-dist/
-build/
+backend/dist/
+backend/build/
+frontend/dist/
+frontend/build/
