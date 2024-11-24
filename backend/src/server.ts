@@ -7,8 +7,11 @@ app.use(express.json())
 
 app.use('/ride', RideRouters)
 
-app.use('/', async (req:Request, res:Response)=>{
-  res.json({message: "Hello World!"})
+app.use((req: Request, res: Response, next: NextFunction)=>{
+  res.status(404).json({
+    error_code: "NOT_FOUND",
+    error_description: "Esta rota está inacessível ou não foi encontrada."
+  })
 })
 
 app.use((err:Error, req: Request, res: Response, next: NextFunction) => {

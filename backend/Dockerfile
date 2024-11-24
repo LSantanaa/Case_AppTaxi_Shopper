@@ -5,8 +5,8 @@ WORKDIR /app-backend
 COPY package*.json ./
 COPY prisma ./
 
-RUN npm install
+RUN run build
 
 EXPOSE 8080
 
-CMD [ "npx","prisma","migrate","dev","npx","prisma","generate","npm", "run", "dev" ]
+CMD [ "node","dist/server.js"]

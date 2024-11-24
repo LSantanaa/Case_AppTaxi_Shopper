@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:postgres@db:5432/appTaxi"
 }
 
 generator client {
@@ -17,5 +17,5 @@ model TravelsHistory {
   driver_id   Int
   driver_name String
   value       Float
-  date        DateTime @default(now())
+  date        DateTime @default(dbgenerated("CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo'"))
 }

@@ -4,7 +4,7 @@ backend/.env
 frontend/.env
 backend/dist
 frontend/dist
-
+/db-data/
 .env.docker
 .env
 *.log

@@ -3,11 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command:  sh -c "echo 'Esperando o banco de dados...'; sleep 10;
-      echo 'Banco de dados disponível!'; 
-      npx prisma migrate dev;
-      npx prisma generate;
-      npm run dev"
+    command: sh -c "npx prisma migrate deploy && node dist/server.js"
     ports:
       - "8080:8080"
     volumes:
@@ -15,19 +11,23 @@ services:
       - /app-backend/node_modules
     depends_on:
       - db
+    environment:
+      - TZ=America/Sao_Paulo
     env_file:
       - .env
   db:
     image: bitnami/postgresql:latest
     ports:
       - "5432:5432"
-    environment:
-      TZ: 'America/Sao_Paulo'
-    env_file:
-      - .env
-  
+    environment: 
+      TZ: America/Sao_Paulo
+      POSTGRESQL_TIMEZONE: America/Sao_Paulo
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_DATABASE: appTaxi
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/appTaxi
     volumes:
-      - db-data:/var/lib/postgresql/data 
+      - ./db-data:/bitnami/postgresql 
   
 volumes:
   db-data:
