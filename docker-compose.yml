@@ -3,14 +3,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: sh -c "npx prisma migrate deploy && node dist/server.js"
+    command: sh -c "npx prisma generate && npx prisma migrate dev --name init && npx prisma migrate deploy && node dist/server.js"
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend:/app-backend
-      - /app-backend/node_modules
+    # volumes:
+    #   - ./backend:/app-backend
+    #   - /app-backend/node_modules
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - TZ=America/Sao_Paulo
     env_file:
@@ -26,6 +27,11 @@ services:
       POSTGRESQL_PASSWORD: postgres
       POSTGRESQL_DATABASE: appTaxi
       DATABASE_URL: postgresql://postgres:postgres@db:5432/appTaxi
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
     volumes:
       - ./db-data:/bitnami/postgresql 
   

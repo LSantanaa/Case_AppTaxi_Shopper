@@ -2,11 +2,12 @@ FROM node:lts
 
 WORKDIR /app-backend
 
-COPY package*.json ./
-COPY prisma ./
+COPY . ./
 
-RUN run build
+RUN npm install
+
+RUN npm run build
 
 EXPOSE 8080
 
-CMD [ "node","dist/server.js"]
+CMD [ "node", "dist/server.js" ]

@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
-    "seed": "ts-node prisma/seed.ts",
     "dev": "nodemon -L --watch src --ext ts --exec ts-node src/server.ts --verbose",
     "build": "tsc",
     "start": "node dist/server.js",

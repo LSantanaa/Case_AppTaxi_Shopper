@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GOOGLE_API_KEY } from "../config/env.";
+import { GOOGLE_API_KEY } from "../config/env";
 import { dataDrivers } from "../db/dbDriver";
 import prisma from "../db/prisma";
 
@@ -41,7 +41,7 @@ interface TravelResponse {
 }
 
 interface TravelData {
-  custumer_id: number;
+  custumer_id: string;
   origin: string;
   destination: string;
   distance: number;
@@ -84,7 +84,7 @@ interface ApiResponse {
 export const requestTravelToApi = async (
   origin: LatLng,
   destination: LatLng,
-  travelMode: "DRIVE"
+  // custumer_id: String
 ): Promise<TravelResponse> => {
   try {
     const res = await axios.post<ApiResponse>(
@@ -92,7 +92,7 @@ export const requestTravelToApi = async (
       {
         origin: { location: { latLng: origin } },
         destination: { location: { latLng: destination } },
-        travelMode,
+        travelMode: "DRIVE",
         computeAlternativeRoutes: false,
       },
       {
@@ -185,7 +185,7 @@ export const saveTravelInDb = async (travelData: TravelData) => {
 
     await prisma.travelsHistory.create({
       data: {
-        custumer_id,
+        custumer_id: custumer_id.toLowerCase(),
         origin,
         destination,
         distance,
@@ -205,7 +205,7 @@ export const saveTravelInDb = async (travelData: TravelData) => {
 
 //consulta as viagens de determinado usuário podendo filtrar por motorista
 export const getTravelsForUser = async (
-  custumer_id: number,
+  custumer_id: string,
   driver_id: number
 ) => {
   try {

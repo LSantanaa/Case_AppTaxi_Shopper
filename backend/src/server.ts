@@ -1,6 +1,6 @@
 import express, {NextFunction, Request, Response} from 'express';
 import RideRouters from './routes';
-import { PORT } from './config/env.';
+import { PORT } from './config/env';
 
 const app = express();
 app.use(express.json())

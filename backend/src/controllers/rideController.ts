@@ -26,9 +26,8 @@ export const estimateTravel = async (
     const estimateTravelData = await requestTravelToApi(
       origin,
       destination,
-      custumer_id
     );
-    res.status(200).json(estimateTravelData);
+    res.status(200).json({custumer_id, estimateTravelData});
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -59,7 +58,7 @@ export const getTravels = async (
 
   if (custumer_id) {
     try {
-      const rides = await getTravelsForUser(Number(custumer_id), Number(driver_id));
+      const rides = await getTravelsForUser(custumer_id.toLocaleLowerCase(), Number(driver_id));
       if(rides){
         res.json({custumer_id, rides})
       }
