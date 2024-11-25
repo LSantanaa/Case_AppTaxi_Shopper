@@ -54,10 +54,10 @@ interface ApiResponse {
   routes: {
     legs: {
       startLocation: {
-        latLng: LatLng
+        latLng: LatLng;
       };
       endLocation: {
-        latLng: LatLng
+        latLng: LatLng;
       };
     }[];
     distanceMeters: number;
@@ -71,14 +71,14 @@ interface ApiResponse {
 //faz a requisição para a Route Api do google e retorna se estiver dentro da regra
 export const requestTravelToApi = async (
   origin: string,
-  destination: string,
+  destination: string
 ): Promise<TravelResponse> => {
   try {
     const res = await axios.post<ApiResponse>(
       API_URL,
       {
-        origin:{ address: origin},
-        destination:{ address: destination},
+        origin: { address: origin },
+        destination: { address: destination },
         travelMode: "DRIVE",
         computeAlternativeRoutes: false,
       },
@@ -86,14 +86,14 @@ export const requestTravelToApi = async (
         headers: HEADERS,
       }
     );
-    
+
     const route = res.data.routes[0];
     const leg = route.legs[0];
-    
+
     /**
      * filtra os motoristas disponíveis com base na distância da viagem e km mínimo do motorista, retornando
      * somente quem deve atender e o valor.
-    */
+     */
 
     const driversOptions = dataDrivers
       .filter((driver) => driver.minMeters <= route.distanceMeters)
@@ -106,7 +106,7 @@ export const requestTravelToApi = async (
         value: Number(
           (driver.rateKM * (route.distanceMeters / 1000)).toFixed(2)
         ),
-      }))
+      }));
 
     const Travel: TravelResponse = {
       origin: {
@@ -133,7 +133,7 @@ export const requestTravelToApi = async (
 //salva a viagem no banco de dados se tudo estiver dentro das regras
 export const saveTravelInDb = async (travelData: TravelData) => {
   try {
-
+    
     const {
       custumer_id,
       origin,
@@ -144,7 +144,18 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       value,
     } = travelData;
 
-    if (!origin || !destination || !custumer_id ||!distance || !duration || !value || origin === destination) {
+    //valida todos os campos recebidos no request, lançando a exceção de Invalid Data
+    if (
+      !origin ||
+      !destination ||
+      !custumer_id ||
+      !distance ||
+      (typeof distance !== "number" || isNaN(distance)) ||
+      !duration ||
+      !value ||
+      (typeof value !== "number" || isNaN(value)) ||
+      origin === destination
+    ) {
       throw {
         status: 400,
         error_code: "INVALID_DATA",
@@ -153,8 +164,10 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       };
     }
 
+    //busca no dbDriver se o motorista selecionado existe
     const selectedDriver = dataDrivers.find(
-      (driverDB) => driverDB.id === driver.id && driverDB.name === driver.name
+      (driverDB) =>
+        driverDB.id === Number(driver.id) && driverDB.name === driver.name
     );
     if (!selectedDriver) {
       throw {
@@ -172,7 +185,6 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       };
     }
 
-    
     await prisma.travelsHistory.create({
       data: {
         custumer_id: custumer_id.toLowerCase(),
@@ -202,7 +214,7 @@ export const getTravelsForUser = async (
     //se um motorista for informado,verifica se é um motorisa válido
     if (driver_id) {
       const isValidDriver = dataDrivers.find((driver) =>
-        driver.id === driver_id ? true : false
+        Number(driver.id) === driver_id ? true : false
       );
 
       if (!isValidDriver) {
