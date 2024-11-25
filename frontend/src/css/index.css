@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#root{
+  height: 100%;
+}
+
+body{
+  width: 100%;
+  height: 100vh;
+}
+
+a {
+  padding: 8px;
+  color: beige;
+  font-size: 24px;
+}
+
+input {
+  @apply block mt-1 px-4 py-2 w-full rounded-xl border border-blue-950;
+}
+label {
+  @apply text-lg font-semibold cursor-pointer;
+}
