@@ -1,32 +1,26 @@
 import { Request, Response } from "express";
 import {
+  getDriversDB,
   getTravelsForUser,
   requestTravelToApi,
   saveTravelInDb,
 } from "../services/rideService";
 
 
-export const estimateTravel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const estimateTravel = async (req: Request,res: Response): Promise<void> => {
+  
   const { origin, destination, custumer_id } = req.body;
 
   if (!origin || !destination || !custumer_id || origin === destination) {
-    res
-      .status(400)
-      .json({
+    res.status(400).json({
         error_code: "INVALID_DATA",
-        error_description:
-          "Os dados fornecidos no corpo da requisição são inválidos",
+        error_description: "Os dados fornecidos no corpo da requisição são inválidos",
       });
     return;
   }
+
   try {
-    const estimateTravelData = await requestTravelToApi(
-      origin,
-      destination,
-    );
+    const estimateTravelData = await requestTravelToApi(origin,destination);
 
     if(estimateTravelData.options.length < 1){
       res.status(202).json({message:"A sua solicitação foi concluída mas não encontrou moristas disponíveis para este trajeto, provavelmente o trajeto é muito curto"})
@@ -38,10 +32,7 @@ export const estimateTravel = async (
   }
 };
 
-export const confirmTravel = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const confirmTravel = async (req: Request,res: Response): Promise<void> => {
   const travelData = req.body;
 
   if (travelData) {
@@ -54,10 +45,7 @@ export const confirmTravel = async (
   }
 };
 
-export const getTravels = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getTravels = async (req: Request,res: Response): Promise<void> => {
   const { custumer_id } = req.params;
   const {driver_id} = req.query;
 
@@ -74,3 +62,21 @@ export const getTravels = async (
     res.status(500).json({message: "Paramêtro de url inválido, insira o id do usuário"})
   }
 };
+
+export const getDrivers = async (req: Request, res: Response): Promise<void>=>{
+  try {
+    const dbDrivers = await getDriversDB();
+    
+    if(dbDrivers){
+      const formatSelectDrivers = dbDrivers.map(driver => {
+        return {
+          driver_id: driver.id,
+          driver_name: driver.name
+        }
+      })
+      res.status(200).json(formatSelectDrivers)
+    }
+  } catch (error) {
+    res.status(500).json({message: "Houve um erro ao recuperar informações dos motoristas"})
+  }
+}

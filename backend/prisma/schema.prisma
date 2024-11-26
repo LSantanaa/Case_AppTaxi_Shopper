@@ -8,6 +8,26 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
+model Drivers {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  car         String
+  rateKM      Float
+  minKM       Int
+  reviews     Review[]
+
+  TravelHistory TravelsHistory[]
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  driver_id Int
+  rating    Float
+  comment   String
+  driver    Drivers @relation(fields: [driver_id], references: [id], onDelete: Cascade)
+}
+
 model TravelsHistory {
   id          Int      @id @default(autoincrement())
   custumer_id String
@@ -16,7 +36,7 @@ model TravelsHistory {
   distance    Int
   duration    String
   driver_id   Int
-  driver_name String
   value       Float
   date        DateTime @default(now())
+  driver      Drivers  @relation(fields: [driver_id], references: [id], onDelete: Cascade)
 }

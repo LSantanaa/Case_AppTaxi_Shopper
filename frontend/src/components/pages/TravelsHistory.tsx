@@ -1,51 +1,34 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { dataDrivers } from "../../db/DriversBase";
 
-interface DataRequestTravel {
+interface DataRequestHistory {
   custumer_id: string;
-  origin: string;
-  destination: string;
+  driver_id?:  string | undefined;
 }
 
 const schema = yup.object({
   custumer_id: yup
     .string()
     .required("O campo de usuário não pode ser em branco."),
-  origin: yup.string().required("O campo origem não pode ser vazio"),
-  destination: yup.string().required("O campo destino não pode ser vazio."),
+  driver_id: yup.string(),
 });
 
-export default function RequestTravel() {
+export default function TravelsHistory() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<DataRequestTravel>({
+  } = useForm<DataRequestHistory>({
     resolver: yupResolver(schema),
   });
-  const onSubmit: SubmitHandler<DataRequestTravel> = async (data) => {
-    if (data) {
-      try {
-        const res = await fetch("http://localhost:8080/ride/estimate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-        
-        const resposta = await res.json()
-
-
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  };
+  const onSubmit: SubmitHandler<DataRequestHistory> = async (data) => {};
 
   return (
     <div className="max-w-screen-md m-auto flex items-center flex-col justify-center mt-5 py-6 px-8 md:p-0">
       <h1 className="w-96 text-xl font-bold m-2">
-        Preencha os dados abaixo para solicitar uma corrida.
+        Insira um usuário para buscar o histórico.
       </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -58,15 +41,16 @@ export default function RequestTravel() {
         </div>
 
         <div>
-          <label htmlFor="origin">Origem:</label>
-          <input {...register("origin")} id="origin" />
-          <span>{errors.origin?.message}</span>
-        </div>
+          <label htmlFor="driver_id">Motorista:</label>
 
-        <div>
-          <label htmlFor="destination">Destino:</label>
-          <input {...register("destination")} id="destination" />
-          <span>{errors.destination?.message}</span>
+          <select {...register("driver_id")}>
+             <option value="">Todos</option>
+            <>{dataDrivers.map((driver) => (
+              <option key={driver.id} value={driver.id}>{driver.name}</option>
+            ))}</>
+          </select>
+
+          <span>{errors.driver_id?.message}</span>
         </div>
 
         <button

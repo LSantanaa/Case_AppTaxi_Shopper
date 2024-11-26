@@ -14,7 +14,7 @@ function App() {
               />
             </div>
             <NavLink to={"/"} className={"px-3 py-2 block hover:text-zinc-400 hover:scale-95 transition"}>Solicitar Viagem</NavLink>
-            <NavLink to={"/"} className={"px-3 py-2 block hover:text-zinc-400 hover:scale-95 transition"}>Histórico</NavLink>
+            <NavLink to={"/history"} className={"px-3 py-2 block hover:text-zinc-400 hover:scale-95 transition"}>Histórico</NavLink>
           </nav>
         </header>
         <main>

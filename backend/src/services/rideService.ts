@@ -1,7 +1,6 @@
 import axios from "axios";
 import { GOOGLE_API_KEY } from "../config/env";
-import { dataDrivers } from "../db/dbDriver";
-import prisma from "../db/prisma";
+import prisma from "../config/prismaClient";
 
 const API_URL = `https://routes.googleapis.com/directions/v2:computeRoutes?key=${GOOGLE_API_KEY}`;
 const HEADERS = {
@@ -9,6 +8,19 @@ const HEADERS = {
   "X-Goog-FieldMask":
     "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
 };
+
+interface TravelData {
+  custumer_id: string;
+  origin: string;
+  destination: string;
+  distance: number;
+  duration: string;
+  driver:{
+    id: number,
+    name: string,
+  }
+  value: number;
+}
 
 interface LatLng {
   latitude: number;
@@ -34,19 +46,6 @@ interface TravelResponse {
   routeResponse: object;
 }
 
-interface TravelData {
-  custumer_id: string;
-  origin: string;
-  destination: string;
-  distance: number;
-  duration: string;
-  driver: {
-    id: number;
-    name: string;
-  };
-  value: number;
-}
-
 /**
  * Interface para a resposta esperada da API, com base nos filtros no Header na requisição
  */
@@ -66,6 +65,21 @@ interface ApiResponse {
       encodedPolyline: string;
     };
   }[];
+}
+
+
+//função para resgatar motoristas salvos no banco
+export const getDriversDB = async ()=>{
+  return await prisma.drivers.findMany({
+    include:{
+      reviews:{
+        select:{
+          rating: true,
+          comment: true,
+        }
+      }
+    }
+  });
 }
 
 //faz a requisição para a Route Api do google e retorna se estiver dentro da regra
@@ -89,24 +103,22 @@ export const requestTravelToApi = async (
 
     const route = res.data.routes[0];
     const leg = route.legs[0];
-
     /**
      * filtra os motoristas disponíveis com base na distância da viagem e km mínimo do motorista, retornando
      * somente quem deve atender e o valor.
      */
+   
+    const driversDB = await getDriversDB();
 
-    const driversOptions = dataDrivers
-      .filter((driver) => driver.minMeters <= route.distanceMeters)
-      .map((driver) => ({
-        id: driver.id,
-        name: driver.name,
-        description: driver.description,
-        vehicle: driver.car,
-        review: driver.review,
-        value: Number(
-          (driver.rateKM * (route.distanceMeters / 1000)).toFixed(2)
-        ),
-      }));
+    const driversOptions = driversDB.filter(driver => (driver.minKM * 1000) <= route.distanceMeters)
+    .map((driver) => ({
+      id: driver.id,
+      name: driver.name,
+      description: driver.description,
+      vehicle: driver.car,
+      review: driver.reviews[0],
+      value: Number((driver.rateKM * (route.distanceMeters / 1000)).toFixed(2)),
+    }));
 
     const Travel: TravelResponse = {
       origin: {
@@ -133,7 +145,6 @@ export const requestTravelToApi = async (
 //salva a viagem no banco de dados se tudo estiver dentro das regras
 export const saveTravelInDb = async (travelData: TravelData) => {
   try {
-    
     const {
       custumer_id,
       origin,
@@ -144,16 +155,18 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       value,
     } = travelData;
 
-    //valida todos os campos recebidos no request, lançando a exceção de Invalid Data
+    //valida todos os campos recebidos no request, lançando a exceção de Invalid Data se encontrar algo errado
     if (
       !origin ||
       !destination ||
       !custumer_id ||
       !distance ||
-      (typeof distance !== "number" || isNaN(distance)) ||
+      typeof distance !== "number" ||
+      isNaN(distance) ||
       !duration ||
       !value ||
-      (typeof value !== "number" || isNaN(value)) ||
+      typeof value !== "number" ||
+      isNaN(value) ||
       origin === destination
     ) {
       throw {
@@ -165,10 +178,9 @@ export const saveTravelInDb = async (travelData: TravelData) => {
     }
 
     //busca no dbDriver se o motorista selecionado existe
-    const selectedDriver = dataDrivers.find(
-      (driverDB) =>
-        driverDB.id === Number(driver.id) && driverDB.name === driver.name
-    );
+    const driversDB = await getDriversDB()
+    const selectedDriver = driversDB.find(driverDB => driverDB.id === Number(driver.id) && driverDB.name === driver.name);
+
     if (!selectedDriver) {
       throw {
         status: 404,
@@ -177,7 +189,7 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       };
     }
 
-    if (distance < selectedDriver.minMeters) {
+    if ((distance / 1000) < selectedDriver.minKM ) {
       throw {
         status: 406,
         error_code: "INVALID_DISTANCE",
@@ -185,18 +197,21 @@ export const saveTravelInDb = async (travelData: TravelData) => {
       };
     }
 
-    await prisma.travelsHistory.create({
-      data: {
-        custumer_id: custumer_id.toLowerCase(),
-        origin,
-        destination,
-        distance,
-        duration,
-        driver_id: selectedDriver.id,
-        driver_name: selectedDriver.name,
-        value,
-      },
-    });
+    await prisma.travelsHistory
+      .create({
+        data: {
+          custumer_id: custumer_id.toLowerCase(),
+          origin,
+          destination,
+          distance,
+          duration,
+          driver_id: selectedDriver.id,
+          value,
+        },
+      })
+      .finally(async () => {
+        await prisma.$disconnect();
+      });
 
     return true;
   } catch (error) {
@@ -213,7 +228,7 @@ export const getTravelsForUser = async (
   try {
     //se um motorista for informado,verifica se é um motorisa válido
     if (driver_id) {
-      const isValidDriver = dataDrivers.find((driver) =>
+      const isValidDriver = (await getDriversDB()).find((driver) =>
         Number(driver.id) === driver_id ? true : false
       );
 
@@ -230,10 +245,14 @@ export const getTravelsForUser = async (
       ? { custumer_id, driver_id }
       : { custumer_id };
 
-    const rides = await prisma.travelsHistory.findMany({
-      where: paramsWhere,
-      orderBy: { date: "desc" },
-    });
+    const rides = await prisma.travelsHistory
+      .findMany({
+        where: paramsWhere,
+        orderBy: { date: "desc" },
+      })
+      .finally(async () => {
+        await prisma.$disconnect();
+      });
 
     if (rides.length < 1) {
       throw {
