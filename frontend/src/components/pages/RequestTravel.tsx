@@ -25,12 +25,29 @@ export default function RequestTravel() {
     resolver: yupResolver(schema),
   });
   const onSubmit: SubmitHandler<DataRequest> = async (data) => {
-    console.log(data);
+    if (data) {
+      try {
+        const res = await fetch("http://localhost:8080/ride/estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+        
+        const resposta = await res.json()
+
+        console.log(resposta)
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
   };
 
   return (
     <div className="max-w-screen-md m-auto flex items-center flex-col justify-center mt-5 py-6 px-8 md:p-0">
-      <h1 className="w-96 text-xl font-bold m-2">Preencha os dados abaixo para solicitar uma corrida.</h1>
+      <h1 className="w-96 text-xl font-bold m-2">
+        Preencha os dados abaixo para solicitar uma corrida.
+      </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-3 w-96"

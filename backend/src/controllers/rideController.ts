@@ -30,9 +30,9 @@ export const estimateTravel = async (
 
     if(estimateTravelData.options.length < 1){
       res.status(202).json({message:"A sua solicitação foi concluída mas não encontrou moristas disponíveis para este trajeto, provavelmente o trajeto é muito curto"})
+    }else{
+      res.status(200).json(estimateTravelData);
     }
-
-    res.status(200).json(estimateTravelData);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
