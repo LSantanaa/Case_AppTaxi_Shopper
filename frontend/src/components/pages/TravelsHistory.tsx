@@ -1,7 +1,6 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { dataDrivers } from "../../db/DriversBase";
 
 interface DataRequestHistory {
   custumer_id: string;
@@ -45,9 +44,8 @@ export default function TravelsHistory() {
 
           <select {...register("driver_id")}>
              <option value="">Todos</option>
-            <>{dataDrivers.map((driver) => (
-              <option key={driver.id} value={driver.id}>{driver.name}</option>
-            ))}</>
+           
+            
           </select>
 
           <span>{errors.driver_id?.message}</span>

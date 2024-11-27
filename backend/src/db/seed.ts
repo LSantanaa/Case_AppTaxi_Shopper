@@ -11,7 +11,7 @@ export default async function seedDriversDb() {
             "Olá! Sou o Homer, seu motorista camarada! Relaxe e aproveite o passeio, com direito a rosquinhas e boas risadas (e talvez alguns desvios).",
           car: "Plymouth Valiant 1973 rosa e enferrujado",
           rateKM: 2.5,
-          minKM: 3,
+          minKM: 1,
         },
         {
           name: "Dominic Toretto",
