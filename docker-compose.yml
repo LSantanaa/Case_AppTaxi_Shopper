@@ -17,11 +17,14 @@ services:
     build: 
      context: ./frontend
      dockerfile: Dockerfile
-    command: sh -c "npm run preview"
+    command: sh -c "npm run dev"
     ports:
       - "80:80"
     depends_on:
       - backend
+    environment:
+      - TZ=America/Sao_Paulo
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     env_file:
       - .env
   db:

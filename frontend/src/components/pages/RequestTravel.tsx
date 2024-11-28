@@ -7,7 +7,7 @@ import { TravelResonse, DataRequestTravel, ConfirmTravel } from "../../types";
 import RenderMap from "../MapsComponents/Map";
 import DriverCard from "../CardDriver";
 
-// const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY;
+const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY;
 
 
 export default function RequestTravel() {
@@ -58,7 +58,7 @@ export default function RequestTravel() {
   };
 
   return (
-    <APIProvider apiKey={"AIzaSyCFk_xK3gZ4dTWfAjkwR6wvKjKq2wuSH4g"}>
+    <APIProvider apiKey={GOOGLE_API_KEY}>
       <div className={`${requestSuccessful ? "max-w-screen-lg" : "max-w-screen-md"} m-auto flex items-center flex-col justify-center mt-5 py-6 px-8 md:p-0`}>
         <h1 className={`text-xl font-bold m-2 md:max-w-96 ${requestSuccessful && 'md:max-w-full' }`}>
           Preencha os dados abaixo para solicitar uma corrida.
