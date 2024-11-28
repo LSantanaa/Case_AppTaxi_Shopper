@@ -5,7 +5,10 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage:{'shopper':"url('/fundo.webp')"},
+      boxShadow:{'shopper-card':"3px 3px 8px 0px #000"}
+    },
   },
   plugins: [],
 }

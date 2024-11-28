@@ -1,9 +1,9 @@
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { useEffect, useRef } from "react";
-import { UseFormClearErrors, UseFormSetValue, UseFormTrigger } from "react-hook-form";
-import { DataRequestTravel } from "../pages/RequestTravel";
+import { UseFormClearErrors, UseFormSetValue } from "react-hook-form";
+import { DataRequestTravel } from "../../types";
 
-export default function PlaceAutocomplete({fieldName,setValue, trigger, clearErrors}: {fieldName: "origin" | "destination"; setValue: UseFormSetValue<DataRequestTravel>; trigger:UseFormTrigger<DataRequestTravel>; clearErrors:UseFormClearErrors<DataRequestTravel>;
+export default function PlaceAutocomplete({fieldName,setValue, clearErrors}: {fieldName: "origin" | "destination"; setValue: UseFormSetValue<DataRequestTravel>; clearErrors:UseFormClearErrors<DataRequestTravel>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const places = useMapsLibrary("places");

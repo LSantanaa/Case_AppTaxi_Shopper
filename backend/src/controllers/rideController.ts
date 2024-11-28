@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import {
   getDriversDB,
-  getTravelsForUser,
+  getHistory,
   requestTravelToApi,
   saveTravelInDb,
 } from "../services/rideService";
@@ -9,9 +9,9 @@ import {
 
 export const estimateTravel = async (req: Request,res: Response): Promise<void> => {
   
-  const { origin, destination, custumer_id } = req.body;
+  const { origin, destination, customer_id } = req.body;
 
-  if (!origin || !destination || !custumer_id || origin === destination) {
+  if (!origin || !destination || !customer_id || origin === destination) {
     res.status(400).json({
         error_code: "INVALID_DATA",
         error_description: "Os dados fornecidos no corpo da requisição são inválidos",
@@ -23,12 +23,12 @@ export const estimateTravel = async (req: Request,res: Response): Promise<void> 
     const estimateTravelData = await requestTravelToApi(origin,destination);
 
     if(estimateTravelData.options.length < 1){
-      res.status(202).json({message:"A sua solicitação foi concluída mas não encontrou moristas disponíveis para este trajeto, provavelmente o trajeto é muito curto"})
+      res.status(202).json({error_description:"A sua solicitação foi concluída mas não encontrou moristas disponíveis para este trajeto, provavelmente o trajeto é muito curto"})
     }else{
       res.status(200).json(estimateTravelData);
     }
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error_description: error.message });
   }
 };
 
@@ -46,20 +46,20 @@ export const confirmTravel = async (req: Request,res: Response): Promise<void> =
 };
 
 export const getTravels = async (req: Request,res: Response): Promise<void> => {
-  const { custumer_id } = req.params;
+  const { customer_id } = req.params;
   const {driver_id} = req.query;
-
-  if (custumer_id) {
+  
+  if (customer_id) {
     try {
-      const rides = await getTravelsForUser(custumer_id.toLocaleLowerCase(), Number(driver_id));
+      const rides = await getHistory(customer_id.toLocaleLowerCase(), Number(driver_id));
       if(rides){
-        res.json({custumer_id, rides})
+        res.json({customer_id, rides})
       }
     } catch (error:any) {
       res.status(error.status).json({error_code: error.error_code, error_description: error.error_description})
     }
   }else{
-    res.status(500).json({message: "Paramêtro de url inválido, insira o id do usuário"})
+    res.status(500).json({error_description: "Paramêtro de url inválido, insira o id do usuário"})
   }
 };
 
@@ -77,6 +77,6 @@ export const getDrivers = async (req: Request, res: Response): Promise<void>=>{
       res.status(200).json(formatSelectDrivers)
     }
   } catch (error) {
-    res.status(500).json({message: "Houve um erro ao recuperar informações dos motoristas"})
+    res.status(500).json({error_description: "Houve um erro ao recuperar informações dos motoristas"})
   }
 }

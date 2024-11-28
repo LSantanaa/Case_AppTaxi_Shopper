@@ -10,7 +10,7 @@ const HEADERS = {
 };
 
 interface TravelData {
-  custumer_id: string;
+  customer_id: string;
   origin: string;
   destination: string;
   distance: number;
@@ -101,6 +101,8 @@ export const requestTravelToApi = async (
       }
     );
 
+    console.log(res)
+
     const route = res.data.routes[0];
     const leg = route.legs[0];
     /**
@@ -146,7 +148,7 @@ export const requestTravelToApi = async (
 export const saveTravelInDb = async (travelData: TravelData) => {
   try {
     const {
-      custumer_id,
+      customer_id,
       origin,
       destination,
       distance,
@@ -159,7 +161,7 @@ export const saveTravelInDb = async (travelData: TravelData) => {
     if (
       !origin ||
       !destination ||
-      !custumer_id ||
+      !customer_id ||
       !distance ||
       typeof distance !== "number" ||
       isNaN(distance) ||
@@ -200,7 +202,7 @@ export const saveTravelInDb = async (travelData: TravelData) => {
     await prisma.travelsHistory
       .create({
         data: {
-          custumer_id: custumer_id.toLowerCase(),
+          customer_id: customer_id.toLowerCase().trim(),
           origin,
           destination,
           distance,
@@ -221,8 +223,8 @@ export const saveTravelInDb = async (travelData: TravelData) => {
 };
 
 //consulta as viagens de determinado usuário podendo filtrar por motorista
-export const getTravelsForUser = async (
-  custumer_id: string,
+export const getHistory = async (
+  customer_id: string,
   driver_id: number
 ) => {
   try {
@@ -242,13 +244,20 @@ export const getTravelsForUser = async (
     }
 
     const paramsWhere = driver_id
-      ? { custumer_id, driver_id }
-      : { custumer_id };
+      ? { customer_id, driver_id }
+      : { customer_id };
 
     const rides = await prisma.travelsHistory
       .findMany({
         where: paramsWhere,
         orderBy: { date: "desc" },
+        include:{
+          driver:{
+            select:{
+               name:true
+            }
+          }
+        }
       })
       .finally(async () => {
         await prisma.$disconnect();

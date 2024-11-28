@@ -5,7 +5,7 @@ const RideRouters = Router();
 
 RideRouters.post('/estimate', RideController.estimateTravel)
 RideRouters.patch('/confirm', RideController.confirmTravel)
-RideRouters.get('/:custumer_id', RideController.getTravels)
+RideRouters.get('/:customer_id', RideController.getTravels)
 RideRouters.get('/drivers/data', RideController.getDrivers)
 
 export default RideRouters;
