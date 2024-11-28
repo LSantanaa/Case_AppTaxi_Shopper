@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:postgres@localhost:5432/appTaxi"
+  url      = "postgresql://postgres:postgres@db:5432/appTaxi"
 }
 
 generator client {
