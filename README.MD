@@ -33,7 +33,7 @@ Quando o motorista é escolhido, a viagem é salva no banco de dados o que nos l
  - PostgreSQL
 
 #### Docker
-- Toda aplicação foi dockerizada em 3 containers, Frontend exposto na porta 80, backend na porta 8080 e banco de dados na porta 5173 padrão postgres
+- Toda aplicação foi dockerizada em 3 containers, Frontend exposto na porta 80, backend na porta 8080 e banco de dados na porta 5432 padrão postgres
 
 ## Como Executar o Projeto
 
@@ -63,5 +63,10 @@ GOOGLE_API_KEY=< SUA CHAVE GOOGLE>
     
     -   **Frontend**: [http://localhost:80](http://localhost:80)
     -   **Backend**: [http://localhost:8080](http://localhost:8080)
+  
+
+### Atenção
+
+Se precisar salvar um bkp dos dados do banco, crie uma pasta chamada db-data na raiz do projeto, o docker irá utilizar ela como espelhamento dos dados.
 
 Dúvidas e Reports, só abrir uma discussão.

@@ -11,4 +11,15 @@ export default defineConfig({
    'import.meta.env.GOOGLE_API_KEY': JSON.stringify(process.env.GOOGLE_API_KEY),
   },
   plugins: [react()],
+  base: "/",
+  preview: {
+   port: 80,
+   strictPort: true,
+  },
+  server: {
+   port: 80,
+   strictPort: true,
+   host: true,
+   origin: "http://0.0.0.0:8080",
+  },
 })
