@@ -7,7 +7,7 @@ import { TravelResonse, DataRequestTravel, ConfirmTravel } from "../../types";
 import RenderMap from "../MapsComponents/Map";
 import DriverCard from "../CardDriver";
 
-const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY;
+// const GOOGLE_API_KEY = import.meta.env.GOOGLE_API_KEY;
 
 
 export default function RequestTravel() {
